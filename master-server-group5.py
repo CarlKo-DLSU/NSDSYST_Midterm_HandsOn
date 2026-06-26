@@ -1,6 +1,9 @@
+#!/usr/bin/env python3
+
 import json
 import datetime
 import threading
+import argparse
 import Pyro5.api
 
 @Pyro5.api.expose
@@ -52,12 +55,22 @@ class TaskQueue(object):
 
 def main():
     print("Initializing Master Server...")
+    parser = argparse.ArgumentParser(description="Master Server for Pyro5 task queue")
+    parser.add_argument("--ns-host", default="localhost", help="Pyro Name Server host/IP")
+    parser.add_argument("--daemon-host", default="localhost", help="Master daemon bind host/IP")
+    args = parser.parse_args()
+
+    ns_host = args.ns_host
+    daemon_host = args.daemon_host
+    print(f"Name Server host: {ns_host}")
+    print(f"Daemon binding host: {daemon_host}")
+    
     try:
         # Locate the Pyro Name Server
-        ns = Pyro5.api.locate_ns()
+        ns = Pyro5.api.locate_ns(host=ns_host)
         
         # Start daemon and register MasterServer
-        daemon = Pyro5.api.Daemon()
+        daemon = Pyro5.api.Daemon(host=daemon_host)
         uri = daemon.register(TaskQueue)
         ns.register("MasterServer", uri)
         

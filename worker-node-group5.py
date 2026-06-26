@@ -1,6 +1,9 @@
+#!/usr/bin/env python3
+
 import datetime
 import random
 import time
+import argparse
 import Pyro5.api
 
 def get_timestamp():
@@ -26,6 +29,10 @@ def perform_math(action, values):
         return f"Error: Unknown action '{action}'"
 
 def main():
+    parser = argparse.ArgumentParser(description="Worker Node for Pyro5 task queue")
+    parser.add_argument("--ns-host", default="localhost", help="Pyro Name Server host/IP")
+    args = parser.parse_args()
+
     print("=== Worker Node Client ===")
     worker_name = input("Enter worker node name (e.g., Worker_Node_A): ").strip()
     if not worker_name:
@@ -33,9 +40,13 @@ def main():
         
     print(f"[{get_timestamp()}] [INFO] Initialized as {worker_name}")
     
+    # Get Name Server host from command-line argument
+    ns_host = args.ns_host
+    print(f"[{get_timestamp()}] [INFO] Connecting to Name Server at {ns_host}")
+    
     try:
         # Connect to Master Server via Name Server
-        ns = Pyro5.api.locate_ns()
+        ns = Pyro5.api.locate_ns(host=ns_host)
         uri = ns.lookup("MasterServer")
         master = Pyro5.api.Proxy(uri)
         print(f"[{get_timestamp()}] [INFO] Connected to MasterServer.")

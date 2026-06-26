@@ -1,0 +1,102 @@
+Distributed Task Queue (Pyro5) - Group 5 Run Instructions
+
+Prerequisites (all hosts)
+1) Install Python 3 and pip if not installed.
+2) Install Pyro5:
+   pip3 install Pyro5
+3) Ensure all hosts are in the same network and can ping each other.
+
+Example host mapping
+- Host 1 (10.20.101.10): Pyro Name Server + Worker 1
+- Host 2 (10.20.101.16): Master Server
+- Host 3 (10.20.101.20): Worker 2
+
+Project files needed
+- master-server-group5.py
+- worker-node-group5.py
+- tasks.json (must be in the same directory as master-server-group5.py)
+
+------------------------------------------------------------
+STEP 1: Start Pyro Name Server (Host 1)
+------------------------------------------------------------
+Open Terminal 1 on Host 1, go to project directory, then run:
+
+cd ~/midterm
+pyro5-ns -n 0.0.0.0
+
+Keep this terminal running.
+
+------------------------------------------------------------
+STEP 2: Start Master Server (Host 2)
+------------------------------------------------------------
+Open Terminal 1 on Host 2, go to project directory, then run:
+
+cd ~/midterm
+python3 master-server-group5.py --ns-host 10.20.101.10 --daemon-host 10.20.101.16
+
+Where:
+- --ns-host = IP address of Host 1 (Name Server)
+- --daemon-host = IP address of Host 2 (Master Server machine)
+
+Keep this terminal running.
+
+------------------------------------------------------------
+STEP 3: Start Worker 1 (Host 1)
+------------------------------------------------------------
+Open Terminal 2 on Host 1, go to project directory, then run:
+
+cd ~/midterm
+python3 worker-node-group5.py --ns-host 10.20.101.10
+
+Enter a worker name when prompted (example: Worker_Node_A).
+
+------------------------------------------------------------
+STEP 4: Start Worker 2 (Host 3)
+------------------------------------------------------------
+Open Terminal 1 on Host 3, go to project directory, then run:
+
+cd ~/midterm
+python3 worker-node-group5.py --ns-host 10.20.101.10
+
+Enter a worker name when prompted (example: Worker_Node_B).
+
+------------------------------------------------------------
+Expected behavior
+------------------------------------------------------------
+- Workers print [SLEEPING], [FETCHING], [COMPUTING], [SUBMITTING] logs with timestamps.
+- Master prints [SUCCESS] logs when results are submitted.
+- When no pending tasks remain, workers print [IDLE].
+
+------------------------------------------------------------
+Troubleshooting
+------------------------------------------------------------
+1) "Failed to discover MasterServer"
+   - Verify Name Server is running on Host 1.
+   - Verify all processes use the same --ns-host value.
+
+2) Connection refused / cannot connect
+   - Check host IP addresses are correct.
+   - Check firewall rules allow traffic (especially Name Server port 9090).
+
+3) tasks.json not found on Master
+   - Ensure tasks.json is in the same directory where master-server-group5.py is executed.
+
+4) Wrong filename errors
+   - Confirm exact file names:
+     master-server-group5.py
+     worker-node-group5.py
+
+------------------------------------------------------------
+Minimal command summary
+------------------------------------------------------------
+Host 1 (Terminal 1):
+pyro5-ns -n 0.0.0.0
+
+Host 2 (Terminal 1):
+python3 master-server-group5.py --ns-host 10.20.101.10 --daemon-host 10.20.101.16
+
+Host 1 (Terminal 2):
+python3 worker-node-group5.py --ns-host 10.20.101.10
+
+Host 3 (Terminal 1):
+python3 worker-node-group5.py --ns-host 10.20.101.10
