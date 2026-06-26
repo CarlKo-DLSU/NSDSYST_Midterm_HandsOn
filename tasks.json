@@ -1,0 +1,7 @@
+{
+  "1": {"action": "multiply", "values": [10, 5]},
+  "2": {"action": "add", "values": [100, 25]},
+  "3": {"action": "subtract", "values": [50, 15]},
+  "4": {"action": "divide", "values": [200, 4]},
+  "5": {"action": "multiply", "values": [7, 8]}
+}
