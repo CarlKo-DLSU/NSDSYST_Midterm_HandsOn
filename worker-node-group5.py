@@ -3,6 +3,10 @@ import random
 import time
 import Pyro5.api
 
+# Configuration - replace this with the IP address of the machine running pyro5-ns.
+NAMESERVER_HOST = "10.20.10.16"
+NAMESERVER_PORT = 9090
+
 def get_timestamp():
     return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -35,7 +39,7 @@ def main():
     
     try:
         # Connect to Master Server via Name Server
-        ns = Pyro5.api.locate_ns()
+        ns = Pyro5.api.locate_ns(host=NAMESERVER_HOST, port=NAMESERVER_PORT)
         uri = ns.lookup("MasterServer")
         master = Pyro5.api.Proxy(uri)
         print(f"[{get_timestamp()}] [INFO] Connected to MasterServer.")

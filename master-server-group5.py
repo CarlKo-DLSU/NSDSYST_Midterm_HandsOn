@@ -3,6 +3,11 @@ import datetime
 import threading
 import Pyro5.api
 
+# Configuration - replace these with the actual IP addresses of your network hosts.
+NAMESERVER_HOST = "10.20.101.16"  # IP address of the machine running pyro5-ns
+NAMESERVER_PORT = 9090
+MASTER_HOST = "10.20.101.17"  # IP address of the machine running this master server
+
 @Pyro5.api.expose
 @Pyro5.api.behavior(instance_mode="single")
 class TaskQueue(object):
@@ -54,10 +59,11 @@ def main():
     print("Initializing Master Server...")
     try:
         # Locate the Pyro Name Server
-        ns = Pyro5.api.locate_ns()
+        ns = Pyro5.api.locate_ns(host=NAMESERVER_HOST, port=NAMESERVER_PORT)
         
-        # Start daemon and register MasterServer
-        daemon = Pyro5.api.Daemon()
+        # Start daemon and register MasterServer.
+        # Use MASTER_HOST so the returned URI is reachable by remote worker nodes.
+        daemon = Pyro5.api.Daemon(host=MASTER_HOST)
         uri = daemon.register(TaskQueue)
         ns.register("MasterServer", uri)
         
